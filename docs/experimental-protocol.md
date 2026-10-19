@@ -31,3 +31,5 @@ Compare no defense, max-rule routing, always-on purification, and learned-fusion
 Run a separate C&W-style untargeted L2 optimization on a fixed 1,000-image test subset (`seed=2027`). Record attack success on originally correct images and the L2 distortion of successful attacks. Its bounded step count and constant search are implementation settings, not a claim of optimality. Run adaptive PGD at 8/255 on the same subset. The attack differentiates through a soft routing surrogate and uses BPDA for non-differentiable squeezers; report its success only after re-evaluating candidates with the exact discrete fusion pipeline. Label these subset results separately from full-test transfer results.
 
 The experiment measures empirical behavior under these attacks. It makes no certified robustness claim. Inference latency depends on the hardware, batch size, and CPU implementations of JPEG and median filtering.
+
+The CLI supports validation-split integration checks through `evaluate --split validation`; their metrics do not contribute numbers to the final test report.

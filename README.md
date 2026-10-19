@@ -57,6 +57,8 @@ For the purifier-loss ablation, repeat `train-purifier` with `--classification-w
 
 `--device auto` selects CUDA, then Apple MPS, then CPU. Training is computationally expensive; use a GPU when possible. Checkpoints, downloaded data, and experiment output are ignored by Git. The evaluation command records the measured protocol and metrics in JSON. Do not treat reduced `--max-train-batches` or `--test-examples` runs as final results.
 
+For a quick integration check before the final test run, use `evaluate --split validation --test-examples 8 --expensive-subset 4 --cw-steps 2 --cw-binary-search-steps 1 --adaptive-steps 2` with a separate output file. Its metrics are only a software check.
+
 ## Status and limitations
 
 The final proposal and an initial experimental pipeline implementation are present. Full training and evaluation are still pending; this repository does not claim experimental findings. The C&W implementation is a bounded optimization search, and the adaptive PGD check uses BPDA and soft routing to construct candidates, then measures their success on the exact pipeline. Neither establishes certified robustness. JPEG and median filtering currently run on CPU, so reported latency includes host/device transfer and depends on hardware and batch size.

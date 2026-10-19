@@ -55,6 +55,8 @@ def main(argv=None):
     evaluation.add_argument("--classifier", default="checkpoints/classifier.pt")
     evaluation.add_argument("--purifier", default="checkpoints/purifier.pt")
     evaluation.add_argument("--detector", default="checkpoints/detector.json")
+    evaluation.add_argument("--split", choices=("test", "validation"), default="test",
+                            help="use validation for smoke checks; report final results on test")
     evaluation.add_argument("--test-examples", type=int, default=10000)
     evaluation.add_argument("--expensive-subset", type=int, default=1000)
     evaluation.add_argument("--cw-steps", type=int, default=100)
@@ -90,7 +92,8 @@ def main(argv=None):
                                         test_examples=args.test_examples, output=args.output)
     else:
         result = run_evaluation(**shared, classifier_path=args.classifier, purifier_path=args.purifier,
-                                detector_path=args.detector, test_examples=args.test_examples,
+                                detector_path=args.detector, split=args.split,
+                                test_examples=args.test_examples,
                                 expensive_subset=args.expensive_subset, cw_steps=args.cw_steps,
                                 cw_binary_search_steps=args.cw_binary_search_steps,
                                 adaptive_steps=args.adaptive_steps, output=args.output)

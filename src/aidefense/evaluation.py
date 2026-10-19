@@ -141,13 +141,19 @@ def run_evaluation(
     output: str, device: torch.device, seed: int = 2026, batch_size: int = 64,
     workers: int = 0, test_examples: int = 10000, expensive_subset: int = 1000,
     cw_steps: int = 100, cw_binary_search_steps: int = 3, adaptive_steps: int = 30,
+    split: str = "test",
 ) -> dict:
     seed_everything(seed)
-    _, _, test = cifar10_datasets(data_dir, seed, augment=False, download=True)
+    if split not in ("test", "validation"):
+        raise ValueError("split must be test or validation")
+    _, validation, official_test = cifar10_datasets(data_dir, seed, augment=False, download=True)
     classifier = load_classifier(classifier_path, device)
     purifier = load_purifier(purifier_path, device)
     detector = Detector.load(detector_path)
     pipeline = DefensePipeline(classifier, purifier, detector)
+    test = validation if split == "validation" else official_test
+    if test_examples > len(test):
+        raise ValueError("test_examples exceeds the selected split size")
     test = fixed_subset(test, test_examples, seed) if test_examples < len(test) else test
     expensive = fixed_subset(test, min(expensive_subset, len(test)), seed + 1)
     conditions = [("clean", None, test)]
@@ -170,7 +176,7 @@ def run_evaluation(
         condition.pop("scores")
     report = {
         "protocol": {
-            "dataset": "CIFAR-10 official test set",
+            "dataset": f"CIFAR-10 {split} split",
             "dataset_source": (
                 "uoft-cs/cifar10@0b2714987fa478483af9968de7c934580d0bb9a2"
                 if ((Path(data_dir) / "hf-train.parquet").exists() and

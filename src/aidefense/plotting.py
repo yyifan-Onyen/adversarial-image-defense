@@ -48,6 +48,33 @@ def plot_results(report_path: str, output_dir: str) -> list[str]:
             produced.append(str(path))
         plt.close(figure)
 
+    figure, axes = plt.subplots(1, 2, figsize=(10.2, 4.3), layout="constrained")
+    for attack, linestyle in (("fgsm", "--"), ("pgd", "-")):
+        relevant = sorted((condition for condition in conditions if condition["attack"] == attack),
+                          key=lambda condition: condition["epsilon_linf"])
+        x_values = [condition["epsilon_linf"] * 255 for condition in relevant]
+        for variant in ("max", "fusion"):
+            for axis, key, scale in ((axes[0], "detection_rate_at_calibrated_threshold", 100),
+                                     (axes[1], "detector_auroc", 1)):
+                if not all(key in condition["variants"][variant] for condition in relevant):
+                    continue
+                y_values = [scale * condition["variants"][variant][key] for condition in relevant]
+                axis.plot(x_values, y_values, marker="o", linestyle=linestyle, linewidth=2,
+                          label=f"{LABELS[variant]} ({attack.upper()})", color=COLORS[variant])
+    axes[0].set(ylabel="Detection rate on attacked images (%)", ylim=(0, 100))
+    axes[1].set(ylabel="Detector AUROC", ylim=(0, 1))
+    for axis in axes:
+        axis.set_xlabel(r"$L_\infty$ budget ($\epsilon$, pixel levels / 255)")
+        axis.set_xticks([4, 8])
+        axis.grid(alpha=0.2)
+    axes[1].legend(frameon=False, fontsize=7, loc="lower right")
+    figure.suptitle("Detection at a 5% clean-validation false-positive target")
+    for extension in ("png", "pdf"):
+        path = output / f"detector_metrics.{extension}"
+        figure.savefig(path, dpi=200)
+        produced.append(str(path))
+    plt.close(figure)
+
     figure, axis = plt.subplots(figsize=(7.2, 4.6), layout="constrained")
     bars = axis.bar(
         [LABELS[variant] for variant in VARIANTS],

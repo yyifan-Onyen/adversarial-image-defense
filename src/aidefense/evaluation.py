@@ -6,6 +6,8 @@ from pathlib import Path
 
 import numpy as np
 import torch
+import torchvision
+import sklearn
 from sklearn.metrics import roc_auc_score
 from torch.utils.data import Subset
 from tqdm.auto import tqdm
@@ -169,11 +171,19 @@ def run_evaluation(
     report = {
         "protocol": {
             "dataset": "CIFAR-10 official test set",
+            "dataset_source": (
+                "uoft-cs/cifar10@0b2714987fa478483af9968de7c934580d0bb9a2"
+                if ((Path(data_dir) / "hf-train.parquet").exists() and
+                    (Path(data_dir) / "hf-test.parquet").exists()) else "TorchVision CIFAR10 download"
+            ),
             "seed": seed,
             "test_examples": test_examples,
             "expensive_subset": min(expensive_subset, len(test)),
+            "expensive_subset_seed": seed + 1,
             "batch_size": batch_size,
             "device": str(device),
+            "versions": {"torch": torch.__version__, "torchvision": torchvision.__version__,
+                         "numpy": np.__version__, "scikit_learn": sklearn.__version__},
             "detector_validation_target_fpr": detector.target_fpr,
             "cw_steps": cw_steps,
             "cw_binary_search_steps": cw_binary_search_steps,

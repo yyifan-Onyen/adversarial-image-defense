@@ -25,11 +25,16 @@ python -m pip install -e '.[dev]'
 adversarial-image-defense train-classifier --epochs 20
 adversarial-image-defense train-purifier --classifier checkpoints/classifier.pt --epochs 10
 adversarial-image-defense fit-detector --classifier checkpoints/classifier.pt
+adversarial-image-defense ablate-squeezers --classifier checkpoints/classifier.pt \
+  --feature-cache checkpoints/detector.features.npz
 adversarial-image-defense evaluate --classifier checkpoints/classifier.pt \
   --purifier checkpoints/purifier.pt --detector checkpoints/detector.json \
   --output runs/final/evaluation.json
+adversarial-image-defense plot-results --report runs/final/evaluation.json
 pytest -q
 ```
+
+For the purifier-loss ablation, repeat `train-purifier` with `--classification-weight 0 --output checkpoints/purifier_no_cls.pt`, then repeat `evaluate` with that purifier and a distinct output path. Compare it with the main three-term run at identical seeds, attacks, batch sizes, and hardware.
 
 `--device auto` selects CUDA, then Apple MPS, then CPU. Training is computationally expensive; use a GPU when possible. Checkpoints, downloaded data, and experiment output are ignored by Git. The evaluation command records the measured protocol and metrics in JSON. Do not treat reduced `--max-train-batches` or `--test-examples` runs as final results.
 

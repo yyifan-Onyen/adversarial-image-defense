@@ -81,7 +81,7 @@ def cw_l2(
                 l2 = (adv - original).flatten(1).square().sum(1)
                 loss = (l2 + constant * margin).sum()
                 optimizer.zero_grad(set_to_none=True)
-                loss.backward()
+                w.grad = torch.autograd.grad(loss, w)[0]
                 optimizer.step()
             with torch.no_grad():
                 success = logits.argmax(1).ne(y)

@@ -182,5 +182,12 @@ def fit_detector(
     output_path = Path(output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     detector.save(output_path)
+    np.savez_compressed(
+        output_path.with_suffix(".features.npz"),
+        train_features=np.concatenate(features),
+        train_labels=np.concatenate(labels),
+        clean_validation_features=np.concatenate(clean_validation_features),
+    )
     return {"train_examples": train_examples, "target_fpr": detector.target_fpr,
-            "fusion_threshold": detector.fusion_threshold, "max_threshold": detector.max_threshold}
+            "fusion_threshold": detector.fusion_threshold, "max_threshold": detector.max_threshold,
+            "feature_cache": str(output_path.with_suffix(".features.npz"))}

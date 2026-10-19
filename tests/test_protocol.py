@@ -2,6 +2,7 @@ import numpy as np
 import torch
 from torch import nn
 
+from aidefense.ablations import fit_ablation, score_ablation
 from aidefense.attacks import cw_l2, fgsm, pgd
 from aidefense.data import split_indices
 from aidefense.detector import Detector, threshold_at_fpr
@@ -88,3 +89,17 @@ def test_cw_attack_returns_bounded_candidate_and_success_mask():
     attacked, success = cw_l2(model, x, y, steps=2, binary_search_steps=1)
     assert attacked.shape == x.shape and success.shape == (1,)
     assert attacked.min() >= 0 and attacked.max() <= 1
+
+
+def test_squeezer_ablation_refits_and_calibrates_both_rules():
+    rng = np.random.default_rng(2026)
+    clean = rng.uniform(0, 0.2, size=(100, 4))
+    attacked = rng.uniform(0.2, 0.8, size=(100, 4))
+    train_features = np.vstack((clean, attacked))
+    train_labels = np.r_[np.zeros(100), np.ones(100)]
+    model, fusion_threshold, max_threshold = fit_ablation(
+        train_features, train_labels, clean, included=[0, 2])
+    scores = score_ablation(model, clean, attacked, [0, 2], fusion_threshold, max_threshold)
+    assert scores["fusion"]["test_clean_fpr"] <= 0.05
+    assert scores["max"]["test_clean_fpr"] <= 0.05
+    assert scores["fusion"]["auroc"] > 0.5

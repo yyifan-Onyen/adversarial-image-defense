@@ -4,6 +4,7 @@ import argparse
 import json
 from pathlib import Path
 
+from .ablations import run_squeezer_ablations
 from .data import resolve_device
 from .evaluation import run_evaluation
 from .training import fit_detector, train_classifier, train_purifier
@@ -40,6 +41,14 @@ def main(argv=None):
     detector.add_argument("--train-examples", type=int, default=5000)
     detector.add_argument("--output", default="checkpoints/detector.json")
 
+    ablations = commands.add_parser("ablate-squeezers", help="retrain fusion after dropping each squeezer")
+    add_common(ablations)
+    ablations.set_defaults(batch_size=64)
+    ablations.add_argument("--classifier", default="checkpoints/classifier.pt")
+    ablations.add_argument("--feature-cache", default="checkpoints/detector.features.npz")
+    ablations.add_argument("--test-examples", type=int, default=1000)
+    ablations.add_argument("--output", default="runs/final/squeezer_ablations.json")
+
     evaluation = commands.add_parser("evaluate", help="run matched defense and attack evaluation")
     add_common(evaluation)
     evaluation.set_defaults(batch_size=64)
@@ -53,7 +62,15 @@ def main(argv=None):
     evaluation.add_argument("--adaptive-steps", type=int, default=30)
     evaluation.add_argument("--output", default="runs/final/evaluation.json")
 
+    plotting = commands.add_parser("plot-results", help="render accuracy and latency figures from measured JSON")
+    plotting.add_argument("--report", default="runs/final/evaluation.json")
+    plotting.add_argument("--output-dir", default="runs/final/figures")
+
     args = parser.parse_args(argv)
+    if args.command == "plot-results":
+        from .plotting import plot_results
+        print("\n".join(plot_results(args.report, args.output_dir)), flush=True)
+        return
     device = resolve_device(args.device)
     shared = dict(data_dir=args.data_dir, device=device, seed=args.seed,
                   batch_size=args.batch_size, workers=args.workers)
@@ -67,13 +84,17 @@ def main(argv=None):
     elif args.command == "fit-detector":
         result = fit_detector(**shared, classifier_path=args.classifier,
                               train_examples=args.train_examples, output=args.output)
+    elif args.command == "ablate-squeezers":
+        result = run_squeezer_ablations(**shared, classifier_path=args.classifier,
+                                        feature_cache=args.feature_cache,
+                                        test_examples=args.test_examples, output=args.output)
     else:
         result = run_evaluation(**shared, classifier_path=args.classifier, purifier_path=args.purifier,
                                 detector_path=args.detector, test_examples=args.test_examples,
                                 expensive_subset=args.expensive_subset, cw_steps=args.cw_steps,
                                 cw_binary_search_steps=args.cw_binary_search_steps,
                                 adaptive_steps=args.adaptive_steps, output=args.output)
-    if args.command != "evaluate":
+    if args.command not in ("evaluate", "ablate-squeezers"):
         output_path = Path(args.output).with_suffix(".metrics.json")
         output_path.write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps(result["protocol"] if args.command == "evaluate" else result, indent=2), flush=True)

@@ -29,4 +29,4 @@ The planned 10-epoch purifier training, full 10,000-image clean/FGSM/PGD accurac
 
 ## Reproducibility
 
-The classifier and epoch-2 purifier weights are available in the repository's preliminary GitHub release. Detector parameters and numeric records are in [`results/preliminary/`](../results/preliminary/). The pinned University of Toronto CIFAR-10 mirror is documented in the [README](../README.md); all training and calibration used seed `2026` on an Apple M5 Pro through PyTorch MPS.
+The classifier and epoch-2 purifier weights are available in the [preliminary GitHub release](https://github.com/yyifan-Onyen/adversarial-image-defense/releases/tag/v0.1.0-preliminary). Detector parameters and numeric records are in [`results/preliminary/`](../results/preliminary/). The pinned University of Toronto CIFAR-10 mirror is documented in the [README](../README.md); all training and calibration used seed `2026` on an Apple M5 Pro through PyTorch MPS.

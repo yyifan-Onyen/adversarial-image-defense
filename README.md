@@ -8,6 +8,8 @@ The [experimental protocol](docs/experimental-protocol.md) records the exact dat
 
 **Current state (October 19, 2026):** The classifier and detector are trained, the purifier has an epoch-2 progress checkpoint, and a 1,000-image squeezer ablation is measured. Computation is paused. See the [progress report](docs/progress-report.md) and [preliminary numeric records](results/preliminary/). The complete defense comparison is pending.
 
+The available model weights and detector feature cache are attached to the [preliminary checkpoint release](https://github.com/yyifan-Onyen/adversarial-image-defense/releases/tag/v0.1.0-preliminary).
+
 ## Research plan
 
 - **Classifier:** Train a ResNet-18 on CIFAR-10, then freeze it for all defense comparisons.

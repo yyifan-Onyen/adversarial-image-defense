@@ -72,6 +72,8 @@ def evaluate_condition(
         elif attack == "cw_l2":
             adversarial, success = cw_l2(pipeline.classifier, x, y, steps=cw_steps,
                                          binary_search_steps=cw_binary_search_steps)
+            with torch.no_grad():
+                success &= pipeline.classifier(x).argmax(1).eq(y)
             distortions = (adversarial - x).flatten(1).norm(p=2, dim=1)
             l2_distortions.extend(distortions[success].detach().cpu().tolist())
         elif attack == "adaptive_pgd":

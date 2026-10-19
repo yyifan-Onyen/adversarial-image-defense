@@ -14,6 +14,23 @@ The [experimental protocol](docs/experimental-protocol.md) records the exact dat
 - **Matched baselines:** Compare no defense, the maximum-disagreement detector routing to the same purifier, always-on purification, and learned routing.
 - **Evaluation:** Report detector AUROC and detection rate, clean and attacked classification accuracy, and end-to-end latency. Evaluate FGSM and PGD at both 4/255 and 8/255; assess C&W L2 and one adaptive attack on a fixed, seeded subset. Report transfer and adaptive results separately.
 
+```mermaid
+flowchart LR
+    x[Input image] --> f[Frozen ResNet-18]
+    x --> s[Three image squeezers]
+    s --> f2[Frozen ResNet-18]
+    f --> d[Prediction disagreement and margin]
+    f2 --> d
+    d --> g[Calibrated fusion detector]
+    g -->|Flagged| p[Residual purifier]
+    x --> p
+    g -->|Unflagged| o[Keep original prediction]
+    f --> o
+    p --> c[Frozen ResNet-18 prediction]
+    c --> r[Final prediction]
+    o --> r
+```
+
 The official CIFAR-10 test set is reserved for final evaluation. Experiments should record data splits, random seeds, attack settings, hardware, and batch sizes. Results will be added only after they are measured and verified.
 
 ## Reproduce the study

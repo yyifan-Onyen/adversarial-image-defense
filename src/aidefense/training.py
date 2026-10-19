@@ -112,7 +112,10 @@ def train_purifier(
             adv = pgd(classifier, x, y, epsilon, steps=7, step_size=2 / 255)
         purified_adv = purifier(adv)
         reconstruction = F.l1_loss(purified_adv, x)
-        classification = F.cross_entropy(classifier(purified_adv), y)
+        classification = (
+            F.cross_entropy(classifier(purified_adv), y)
+            if classification_weight else torch.zeros((), device=x.device)
+        )
         identity = F.l1_loss(purifier(x), x)
         return reconstruction + classification_weight * classification + identity, (reconstruction, classification, identity)
 

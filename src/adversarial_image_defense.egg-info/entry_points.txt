@@ -1,0 +1,2 @@
+[console_scripts]
+adversarial-image-defense = aidefense.cli:main

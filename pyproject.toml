@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=70", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "adversarial-image-defense"
+version = "0.1.0"
+description = "Learned fusion detection and selective purification for adversarial CIFAR-10 images"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "numpy>=1.26",
+  "pillow>=10",
+  "scikit-learn>=1.4",
+  "scipy>=1.11",
+  "torch>=2.3",
+  "torchvision>=0.18",
+  "tqdm>=4.66",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "matplotlib>=3.8"]
+hf-data = ["pyarrow>=15"]
+
+[project.scripts]
+adversarial-image-defense = "aidefense.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

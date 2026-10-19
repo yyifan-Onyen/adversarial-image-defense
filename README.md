@@ -14,9 +14,30 @@ This repository is the workspace for Team 5's CSCI 8000 final project at the Uni
 
 The official CIFAR-10 test set is reserved for final evaluation. Experiments should record data splits, random seeds, attack settings, hardware, and batch sizes. Results will be added only after they are measured and verified.
 
-## Status
+## Reproduce the study
 
-The final proposal is archived here. Implementation and experimental results are pending.
+Use Python 3.10 or newer. By default, TorchVision downloads CIFAR-10 into the ignored `data/` directory. If that server is slow, the pinned University of Toronto Hugging Face mirror can be downloaded with `scripts/download_cifar10_parquet.sh data` after installing `.[dev,hf-data]`; the loader automatically uses those two files and checks the train/test sizes. The default seed is `2026`; the 50,000 training images are split into 45,000 training and 5,000 validation images. The official 10,000-image test set is never used for model selection.
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -e '.[dev]'
+adversarial-image-defense train-classifier --epochs 20
+adversarial-image-defense train-purifier --classifier checkpoints/classifier.pt --epochs 10
+adversarial-image-defense fit-detector --classifier checkpoints/classifier.pt
+adversarial-image-defense evaluate --classifier checkpoints/classifier.pt \
+  --purifier checkpoints/purifier.pt --detector checkpoints/detector.json \
+  --output runs/final/evaluation.json
+pytest -q
+```
+
+`--device auto` selects CUDA, then Apple MPS, then CPU. Training is computationally expensive; use a GPU when possible. Checkpoints, downloaded data, and experiment output are ignored by Git. The evaluation command records the measured protocol and metrics in JSON. Do not treat reduced `--max-train-batches` or `--test-examples` runs as final results.
+
+## Status and limitations
+
+The final proposal and an initial experimental pipeline implementation are present. Full training and evaluation are still pending; this repository does not claim experimental findings. The C&W implementation is a bounded optimization search, and the adaptive PGD check uses BPDA and soft routing to construct candidates, then measures their success on the exact pipeline. Neither establishes certified robustness. JPEG and median filtering currently run on CPU, so reported latency includes host/device transfer and depends on hardware and batch size.
+
+Project members should verify course rules governing AI-assisted work before using this repository for a graded submission. External resources include the public CIFAR-10 dataset, the TorchVision ResNet-18 implementation, and the papers cited in the proposal.
 
 ## Team
 

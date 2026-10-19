@@ -4,6 +4,8 @@ An empirical study of input-side defenses for a clean-trained CIFAR-10 classifie
 
 This repository is the workspace for Team 5's CSCI 8000 final project at the University of Georgia. The [final project proposal](docs/final-project-proposal.pdf) defines the agreed scope and evaluation plan.
 
+The [experimental protocol](docs/experimental-protocol.md) records the exact data split, model selection, attacks, metrics, and limitations implemented here.
+
 ## Research plan
 
 - **Classifier:** Train a ResNet-18 on CIFAR-10, then freeze it for all defense comparisons.

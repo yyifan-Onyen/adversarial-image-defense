@@ -25,6 +25,7 @@ def load_classifier(path: str | Path, device: torch.device) -> nn.Module:
     checkpoint = torch.load(path, map_location="cpu", weights_only=True)
     model = build_classifier()
     model.load_state_dict(checkpoint["state_dict"])
+    model.requires_grad_(False)
     return model.to(device).eval()
 
 
@@ -32,6 +33,7 @@ def load_purifier(path: str | Path, device: torch.device) -> nn.Module:
     checkpoint = torch.load(path, map_location="cpu", weights_only=True)
     model = Purifier()
     model.load_state_dict(checkpoint["state_dict"])
+    model.requires_grad_(False)
     return model.to(device).eval()
 
 
@@ -130,8 +132,6 @@ def train_purifier(
         purifier.eval()
         val_loss = val_count = 0
         for batch_index, (x, y) in enumerate(val_loader):
-            if batch_index >= 4:
-                break
             x, y = x.to(device), y.to(device)
             with torch.enable_grad():
                 loss, _ = batch_loss(x, y, batch_index)

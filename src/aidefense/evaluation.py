@@ -141,7 +141,7 @@ def run_evaluation(
     output: str, device: torch.device, seed: int = 2026, batch_size: int = 64,
     workers: int = 0, test_examples: int = 10000, expensive_subset: int = 1000,
     cw_steps: int = 100, cw_binary_search_steps: int = 3, adaptive_steps: int = 30,
-    split: str = "test",
+    split: str = "test", include_expensive: bool = True,
 ) -> dict:
     seed_everything(seed)
     if split not in ("test", "validation"):
@@ -158,7 +158,8 @@ def run_evaluation(
     expensive = fixed_subset(test, min(expensive_subset, len(test)), seed + 1)
     conditions = [("clean", None, test)]
     conditions += [(attack, epsilon, test) for attack in ("fgsm", "pgd") for epsilon in (4 / 255, 8 / 255)]
-    conditions += [("cw_l2", None, expensive), ("adaptive_pgd", 8 / 255, expensive)]
+    if include_expensive:
+        conditions += [("cw_l2", None, expensive), ("adaptive_pgd", 8 / 255, expensive)]
     raw = [evaluate_condition(pipeline, subset, device, seed, batch_size, attack, epsilon, workers,
                               cw_steps, cw_binary_search_steps, adaptive_steps)
            for attack, epsilon, subset in conditions]
@@ -197,6 +198,7 @@ def run_evaluation(
             "cw_initial_const": 0.1,
             "cw_confidence": 0.0,
             "adaptive_steps": adaptive_steps,
+            "include_expensive_attacks": include_expensive,
             "transfer_attacks_target": "unprotected classifier",
             "adaptive_candidate_target": "differentiable fusion-routing surrogate with BPDA",
             "adaptive_success_checked_on": "exact fusion pipeline",

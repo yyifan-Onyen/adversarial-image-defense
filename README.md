@@ -53,7 +53,7 @@ adversarial-image-defense plot-results --report runs/final/evaluation.json
 pytest -q
 ```
 
-For the purifier-loss ablation, repeat `train-purifier` with `--classification-weight 0 --output checkpoints/purifier_no_cls.pt`, then repeat `evaluate` with that purifier and a distinct output path. Compare it with the main three-term run at identical seeds, attacks, batch sizes, and hardware.
+For the purifier-loss ablation, repeat `train-purifier` with `--classification-weight 0 --output checkpoints/purifier_no_cls.pt`, then repeat `evaluate --skip-expensive` with that purifier and a distinct output path. This repeats the full-test clean, FGSM, and PGD conditions with identical seeds, attacks, batch sizes, and hardware; C&W and adaptive subset checks are reserved for the main model.
 
 `--device auto` selects CUDA, then Apple MPS, then CPU. Training is computationally expensive; use a GPU when possible. Checkpoints, downloaded data, and experiment output are ignored by Git. The evaluation command records the measured protocol and metrics in JSON. Do not treat reduced `--max-train-batches` or `--test-examples` runs as final results.
 

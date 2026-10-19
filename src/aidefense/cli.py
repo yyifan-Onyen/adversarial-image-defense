@@ -62,6 +62,8 @@ def main(argv=None):
     evaluation.add_argument("--cw-steps", type=int, default=100)
     evaluation.add_argument("--cw-binary-search-steps", type=int, default=3)
     evaluation.add_argument("--adaptive-steps", type=int, default=30)
+    evaluation.add_argument("--skip-expensive", action="store_true",
+                            help="omit C&W and adaptive checks for a matched loss ablation")
     evaluation.add_argument("--output", default="runs/final/evaluation.json")
 
     plotting = commands.add_parser("plot-results", help="render accuracy and latency figures from measured JSON")
@@ -96,7 +98,8 @@ def main(argv=None):
                                 test_examples=args.test_examples,
                                 expensive_subset=args.expensive_subset, cw_steps=args.cw_steps,
                                 cw_binary_search_steps=args.cw_binary_search_steps,
-                                adaptive_steps=args.adaptive_steps, output=args.output)
+                                adaptive_steps=args.adaptive_steps,
+                                include_expensive=not args.skip_expensive, output=args.output)
     if args.command not in ("evaluate", "ablate-squeezers"):
         output_path = Path(args.output).with_suffix(".metrics.json")
         output_path.write_text(json.dumps(result, indent=2) + "\n")

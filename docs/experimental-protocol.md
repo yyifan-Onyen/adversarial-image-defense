@@ -24,6 +24,8 @@ The residual convolutional autoencoder has three convolutional encoder layers an
 
 Both MAE terms average over images, channels, and pixels. The loss ablation sets the classification weight to zero and otherwise uses the same architecture, data split, attack settings, and seed. Each model is selected by its loss on the validation split. At inference, routed variants purify only flagged images, while the always-purify baseline processes every image.
 
+For the loss ablation, repeat the clean, FGSM, and PGD full-test conditions with `evaluate --skip-expensive`. The C&W and adaptive subset checks evaluate the main model only.
+
 ## Evaluation
 
 Compare no defense, max-rule routing, always-on purification, and learned-fusion routing on identical test inputs. FGSM and 20-step PGD are generated against the unprotected classifier at both 4/255 and 8/255. PGD starts uniformly within the allowed L-infinity ball and uses a step of `epsilon / 8`. These are transfer attacks against the defense. Report per-condition classification accuracy, baseline attack success on originally correct images, detector AUROC, detection rate at the validation-calibrated threshold, and complete-pipeline inference latency in milliseconds per image. Latency excludes attack generation and includes feature squeezing, host/device transfers, detection, routing, purification, and classification.

@@ -1,0 +1,129 @@
+{
+  "seed": 2026,
+  "test_examples": 1000,
+  "target_validation_fpr": 0.05,
+  "attacks": "PGD transfer attacks on the unprotected classifier",
+  "ablations": {
+    "all": {
+      "included_squeezers": [
+        "quantize_4bit",
+        "median_3x3",
+        "jpeg_q50"
+      ],
+      "pgd_4_255": {
+        "fusion": {
+          "test_clean_fpr": 0.047,
+          "attacked_detection_rate": 0.486,
+          "auroc": 0.8631555
+        },
+        "max": {
+          "test_clean_fpr": 0.048,
+          "attacked_detection_rate": 0.59,
+          "auroc": 0.8796279999999999
+        }
+      },
+      "pgd_8_255": {
+        "fusion": {
+          "test_clean_fpr": 0.047,
+          "attacked_detection_rate": 0.284,
+          "auroc": 0.773499
+        },
+        "max": {
+          "test_clean_fpr": 0.048,
+          "attacked_detection_rate": 0.446,
+          "auroc": 0.796602
+        }
+      }
+    },
+    "without_quantize_4bit": {
+      "included_squeezers": [
+        "median_3x3",
+        "jpeg_q50"
+      ],
+      "pgd_4_255": {
+        "fusion": {
+          "test_clean_fpr": 0.048,
+          "attacked_detection_rate": 0.466,
+          "auroc": 0.8577
+        },
+        "max": {
+          "test_clean_fpr": 0.048,
+          "attacked_detection_rate": 0.594,
+          "auroc": 0.881013
+        }
+      },
+      "pgd_8_255": {
+        "fusion": {
+          "test_clean_fpr": 0.048,
+          "attacked_detection_rate": 0.266,
+          "auroc": 0.7648675
+        },
+        "max": {
+          "test_clean_fpr": 0.048,
+          "attacked_detection_rate": 0.446,
+          "auroc": 0.799007
+        }
+      }
+    },
+    "without_median_3x3": {
+      "included_squeezers": [
+        "quantize_4bit",
+        "jpeg_q50"
+      ],
+      "pgd_4_255": {
+        "fusion": {
+          "test_clean_fpr": 0.047,
+          "attacked_detection_rate": 0.448,
+          "auroc": 0.84477
+        },
+        "max": {
+          "test_clean_fpr": 0.046,
+          "attacked_detection_rate": 0.553,
+          "auroc": 0.867265
+        }
+      },
+      "pgd_8_255": {
+        "fusion": {
+          "test_clean_fpr": 0.047,
+          "attacked_detection_rate": 0.36,
+          "auroc": 0.7803655
+        },
+        "max": {
+          "test_clean_fpr": 0.046,
+          "attacked_detection_rate": 0.443,
+          "auroc": 0.795321
+        }
+      }
+    },
+    "without_jpeg_q50": {
+      "included_squeezers": [
+        "quantize_4bit",
+        "median_3x3"
+      ],
+      "pgd_4_255": {
+        "fusion": {
+          "test_clean_fpr": 0.053,
+          "attacked_detection_rate": 0.278,
+          "auroc": 0.7823180000000001
+        },
+        "max": {
+          "test_clean_fpr": 0.046,
+          "attacked_detection_rate": 0.43,
+          "auroc": 0.809482
+        }
+      },
+      "pgd_8_255": {
+        "fusion": {
+          "test_clean_fpr": 0.053,
+          "attacked_detection_rate": 0.139,
+          "auroc": 0.657281
+        },
+        "max": {
+          "test_clean_fpr": 0.046,
+          "attacked_detection_rate": 0.242,
+          "auroc": 0.6681359999999998
+        }
+      }
+    }
+  }
+}

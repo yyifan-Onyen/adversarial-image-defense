@@ -6,6 +6,8 @@ This repository is the workspace for Team 5's CSCI 8000 final project at the Uni
 
 The [experimental protocol](docs/experimental-protocol.md) records the exact data split, model selection, attacks, metrics, and limitations implemented here.
 
+**Current state (October 19, 2026):** The classifier and detector are trained, the purifier has an epoch-2 progress checkpoint, and a 1,000-image squeezer ablation is measured. Computation is paused. See the [progress report](docs/progress-report.md) and [preliminary numeric records](results/preliminary/). The complete defense comparison is pending.
+
 ## Research plan
 
 - **Classifier:** Train a ResNet-18 on CIFAR-10, then freeze it for all defense comparisons.
@@ -31,7 +33,7 @@ flowchart LR
     o --> r
 ```
 
-The official CIFAR-10 test set is reserved for final evaluation. Experiments should record data splits, random seeds, attack settings, hardware, and batch sizes. Results will be added only after they are measured and verified.
+The official CIFAR-10 test set is excluded from model selection; a fixed 1,000-image subset has been used for the preliminary squeezer ablation. Experiments record data splits, random seeds, attack settings, hardware, and batch sizes. Results are added only after they are measured and verified.
 
 ## Reproduce the study
 
@@ -61,9 +63,9 @@ For a quick integration check before the final test run, use `evaluate --split v
 
 ## Status and limitations
 
-The final proposal and an initial experimental pipeline implementation are present. Full training and evaluation are still pending; this repository does not claim experimental findings. The C&W implementation is a bounded optimization search, and the adaptive PGD check uses BPDA and soft routing to construct candidates, then measures their success on the exact pipeline. Neither establishes certified robustness. JPEG and median filtering currently run on CPU, so reported latency includes host/device transfer and depends on hardware and batch size.
+The proposal, implementation, classifier training, detector calibration, and a preliminary squeezer ablation are present. The main purifier finished 2 of 10 planned epochs before computation was paused. Full accuracy, latency, C&W, adaptive, and purifier-loss-ablation results are pending; this repository does not claim completed defense findings. The C&W implementation is a bounded optimization search, and the adaptive PGD check uses BPDA and soft routing to construct candidates, then measures their success on the exact pipeline. Neither establishes certified robustness. JPEG and median filtering run on CPU, so eventual latency will include host/device transfer and depend on hardware and batch size.
 
-Project members should verify course rules governing AI-assisted work before using this repository for a graded submission. External resources include the public CIFAR-10 dataset, the TorchVision ResNet-18 implementation, and the papers cited in the proposal.
+OpenAI Codex assisted with implementation and documentation. External resources include the public CIFAR-10 dataset, the TorchVision ResNet-18 implementation, and the papers cited in the proposal.
 
 ## Team
 

@@ -1,0 +1,18 @@
+{
+  "feature_names": [
+    "quantize_4bit",
+    "median_3x3",
+    "jpeg_q50",
+    "prediction_margin"
+  ],
+  "coefficients": [
+    -0.8156744241714478,
+    0.9252805709838867,
+    1.2464145421981812,
+    -1.7562130689620972
+  ],
+  "intercept": -0.152952641248703,
+  "fusion_threshold": 1.6497427467165515,
+  "max_threshold": 1.9402263164520264,
+  "target_fpr": 0.05
+}

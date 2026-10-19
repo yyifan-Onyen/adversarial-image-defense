@@ -1,0 +1,7 @@
+{
+  "train_examples": 5000,
+  "target_fpr": 0.05,
+  "fusion_threshold": 1.6497427467165515,
+  "max_threshold": 1.9402263164520264,
+  "feature_cache": "checkpoints/detector.features.npz"
+}

@@ -15,6 +15,7 @@ LABELS = {
     "always": "Always purify",
     "fusion": "Learned fusion + purifier",
 }
+DETECTOR_LABELS = {"max": "Max rule", "fusion": "Learned fusion"}
 COLORS = {"none": "#6b7280", "max": "#d97706", "always": "#7c3aed", "fusion": "#0f766e"}
 
 
@@ -60,14 +61,15 @@ def plot_results(report_path: str, output_dir: str) -> list[str]:
                     continue
                 y_values = [scale * condition["variants"][variant][key] for condition in relevant]
                 axis.plot(x_values, y_values, marker="o", linestyle=linestyle, linewidth=2,
-                          label=f"{LABELS[variant]} ({attack.upper()})", color=COLORS[variant])
+                          label=f"{DETECTOR_LABELS[variant]} ({attack.upper()})", color=COLORS[variant])
     axes[0].set(ylabel="Detection rate on attacked images (%)", ylim=(0, 100))
     axes[1].set(ylabel="Detector AUROC", ylim=(0, 1))
     for axis in axes:
         axis.set_xlabel(r"$L_\infty$ budget ($\epsilon$, pixel levels / 255)")
         axis.set_xticks([4, 8])
         axis.grid(alpha=0.2)
-    axes[1].legend(frameon=False, fontsize=7, loc="lower right")
+    handles, labels = axes[1].get_legend_handles_labels()
+    figure.legend(handles, labels, frameon=False, fontsize=8, ncol=2, loc="outside lower center")
     figure.suptitle("Detection at a 5% clean-validation false-positive target")
     for extension in ("png", "pdf"):
         path = output / f"detector_metrics.{extension}"

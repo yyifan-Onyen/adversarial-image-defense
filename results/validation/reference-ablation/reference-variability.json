@@ -1,0 +1,61 @@
+{
+  "split": "validation",
+  "examples": 256,
+  "subset_seed": 2126,
+  "draws_per_image": 16,
+  "purifier": {
+    "type": "freqpure",
+    "unet": "checkpoints/ddpm-cifar10-32",
+    "max_timestep": 1000,
+    "num_denoising_steps": 100,
+    "amplitude_cut": 10,
+    "phase_cut": 10,
+    "delta": 0.3,
+    "reference_timestep": 50,
+    "sampling": "ddpm",
+    "ensemble_runs": 1,
+    "reference": "per_step",
+    "reference_eps_steps": 20
+  },
+  "reference_noise_std": 0.17334499955177307,
+  "low_band_frequencies": 317,
+  "total_frequencies": 1024,
+  "conditions": {
+    "clean": {
+      "low": {
+        "snr_mean_over_draw_deviation": 767.5576753033652,
+        "share_of_draw_deviation_energy": 0.7337198039850135,
+        "mean_amplitude_cv": 0.22630615715724814,
+        "mean_phase_circular_std_rad": 0.303378011902048,
+        "fraction_phase_moves_beyond_delta": 0.22667802395504733
+      },
+      "high": {
+        "snr_mean_over_draw_deviation": 9.084593540539892,
+        "share_of_draw_deviation_energy": 0.26628019601498654,
+        "mean_amplitude_cv": 0.3797477711376746,
+        "mean_phase_circular_std_rad": 0.645004437926354,
+        "fraction_phase_moves_beyond_delta": 0.4956088068349246
+      }
+    },
+    "pgd_8": {
+      "low": {
+        "snr_mean_over_draw_deviation": 735.244461834669,
+        "share_of_draw_deviation_energy": 0.7268634453109493,
+        "mean_amplitude_cv": 0.23166779238342863,
+        "mean_phase_circular_std_rad": 0.31411533776893974,
+        "fraction_phase_moves_beyond_delta": 0.23621439808425343
+      },
+      "high": {
+        "snr_mean_over_draw_deviation": 8.185209383114705,
+        "share_of_draw_deviation_energy": 0.27313655468905074,
+        "mean_amplitude_cv": 0.3915585127151108,
+        "mean_phase_circular_std_rad": 0.6798669076763982,
+        "fraction_phase_moves_beyond_delta": 0.5168332716363154
+      }
+    }
+  },
+  "attack_shift_over_draw_deviation": {
+    "low": 0.2591656624008517,
+    "high": 0.3185591961592668
+  }
+}

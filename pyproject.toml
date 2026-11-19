@@ -19,8 +19,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "matplotlib>=3.8"]
+dev = ["pytest>=8"]
 hf-data = ["pyarrow>=15"]
+freqpure = ["diffusers>=0.30", "safetensors>=0.4"]
 
 [project.scripts]
 adversarial-image-defense = "aidefense.cli:main"

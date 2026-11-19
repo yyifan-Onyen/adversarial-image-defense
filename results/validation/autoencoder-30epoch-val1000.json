@@ -1,0 +1,285 @@
+{
+  "protocol": {
+    "dataset": "CIFAR-10 validation split",
+    "dataset_source": "uoft-cs/cifar10@0b2714987fa478483af9968de7c934580d0bb9a2",
+    "seed": 2026,
+    "test_examples": 1000,
+    "expensive_subset": 1000,
+    "expensive_subset_seed": 2027,
+    "batch_size": 64,
+    "device": "cuda",
+    "versions": {
+      "torch": "2.13.0+cu130",
+      "torchvision": "0.28.0+cu130",
+      "numpy": "2.5.2",
+      "scikit_learn": "1.9.1"
+    },
+    "detector_validation_target_fpr": 0.05,
+    "cw_steps": 100,
+    "cw_binary_search_steps": 3,
+    "cw_learning_rate": 0.01,
+    "cw_initial_const": 0.1,
+    "cw_confidence": 0.0,
+    "adaptive_steps": 30,
+    "include_expensive_attacks": false,
+    "transfer_attacks_target": "unprotected classifier",
+    "adaptive_candidate_target": "differentiable fusion-routing surrogate with BPDA",
+    "adaptive_success_checked_on": "exact fusion pipeline"
+  },
+  "conditions": [
+    {
+      "attack": "clean",
+      "epsilon_linf": null,
+      "examples": 1000,
+      "variants": {
+        "none": {
+          "accuracy": 0.938,
+          "flagged_fraction": null,
+          "latency_ms_per_image": 0.26490790001116693
+        },
+        "max": {
+          "accuracy": 0.922,
+          "flagged_fraction": 0.052,
+          "latency_ms_per_image": 0.7081717997789383
+        },
+        "always": {
+          "accuracy": 0.805,
+          "flagged_fraction": null,
+          "latency_ms_per_image": 0.060340399912092835
+        },
+        "fusion": {
+          "accuracy": 0.919,
+          "flagged_fraction": 0.052,
+          "latency_ms_per_image": 0.5926737998961471
+        }
+      },
+      "oracle_routing_diagnostic": {
+        "accuracy": 0.958,
+        "counts": {
+          "both_correct": 785,
+          "raw_only_correct": 153,
+          "purified_only_correct": 20,
+          "both_wrong": 42
+        },
+        "fractions": {
+          "both_correct": 0.785,
+          "raw_only_correct": 0.153,
+          "purified_only_correct": 0.02,
+          "both_wrong": 0.042
+        },
+        "purifier_rescue_fraction": 0.02,
+        "purifier_harm_fraction": 0.153,
+        "uses_ground_truth_labels": true,
+        "deployable": false
+      }
+    },
+    {
+      "attack": "fgsm",
+      "epsilon_linf": 0.01568627450980392,
+      "examples": 1000,
+      "variants": {
+        "none": {
+          "accuracy": 0.139,
+          "flagged_fraction": null,
+          "latency_ms_per_image": 0.04366569989360869
+        },
+        "max": {
+          "accuracy": 0.322,
+          "flagged_fraction": 0.25,
+          "latency_ms_per_image": 0.652382500062231,
+          "detector_auroc": 0.7654540000000001,
+          "detection_rate_at_calibrated_threshold": 0.25
+        },
+        "always": {
+          "accuracy": 0.685,
+          "flagged_fraction": null,
+          "latency_ms_per_image": 0.04754749988205731
+        },
+        "fusion": {
+          "accuracy": 0.426,
+          "flagged_fraction": 0.368,
+          "latency_ms_per_image": 0.6197615999844857,
+          "detector_auroc": 0.808539,
+          "detection_rate_at_calibrated_threshold": 0.368
+        }
+      },
+      "oracle_routing_diagnostic": {
+        "accuracy": 0.6890000000000001,
+        "counts": {
+          "both_correct": 135,
+          "raw_only_correct": 4,
+          "purified_only_correct": 550,
+          "both_wrong": 311
+        },
+        "fractions": {
+          "both_correct": 0.135,
+          "raw_only_correct": 0.004,
+          "purified_only_correct": 0.55,
+          "both_wrong": 0.311
+        },
+        "purifier_rescue_fraction": 0.55,
+        "purifier_harm_fraction": 0.004,
+        "uses_ground_truth_labels": true,
+        "deployable": false
+      },
+      "baseline_attack_success_rate_on_initially_correct": 0.8528784648187633,
+      "initially_correct_examples": 938
+    },
+    {
+      "attack": "fgsm",
+      "epsilon_linf": 0.03137254901960784,
+      "examples": 1000,
+      "variants": {
+        "none": {
+          "accuracy": 0.089,
+          "flagged_fraction": null,
+          "latency_ms_per_image": 0.03986569994594902
+        },
+        "max": {
+          "accuracy": 0.204,
+          "flagged_fraction": 0.176,
+          "latency_ms_per_image": 0.59370319993468,
+          "detector_auroc": 0.7528175,
+          "detection_rate_at_calibrated_threshold": 0.176
+        },
+        "always": {
+          "accuracy": 0.555,
+          "flagged_fraction": null,
+          "latency_ms_per_image": 0.05044300004374236
+        },
+        "fusion": {
+          "accuracy": 0.323,
+          "flagged_fraction": 0.364,
+          "latency_ms_per_image": 0.5649589000386186,
+          "detector_auroc": 0.806343,
+          "detection_rate_at_calibrated_threshold": 0.364
+        }
+      },
+      "oracle_routing_diagnostic": {
+        "accuracy": 0.5609999999999999,
+        "counts": {
+          "both_correct": 83,
+          "raw_only_correct": 6,
+          "purified_only_correct": 472,
+          "both_wrong": 439
+        },
+        "fractions": {
+          "both_correct": 0.083,
+          "raw_only_correct": 0.006,
+          "purified_only_correct": 0.472,
+          "both_wrong": 0.439
+        },
+        "purifier_rescue_fraction": 0.472,
+        "purifier_harm_fraction": 0.006,
+        "uses_ground_truth_labels": true,
+        "deployable": false
+      },
+      "baseline_attack_success_rate_on_initially_correct": 0.906183368869936,
+      "initially_correct_examples": 938
+    },
+    {
+      "attack": "pgd",
+      "epsilon_linf": 0.01568627450980392,
+      "examples": 1000,
+      "variants": {
+        "none": {
+          "accuracy": 0.0,
+          "flagged_fraction": null,
+          "latency_ms_per_image": 0.04089949984336272
+        },
+        "max": {
+          "accuracy": 0.463,
+          "flagged_fraction": 0.563,
+          "latency_ms_per_image": 0.6036092000431381,
+          "detector_auroc": 0.860562,
+          "detection_rate_at_calibrated_threshold": 0.563
+        },
+        "always": {
+          "accuracy": 0.693,
+          "flagged_fraction": null,
+          "latency_ms_per_image": 0.04695510020246729
+        },
+        "fusion": {
+          "accuracy": 0.382,
+          "flagged_fraction": 0.444,
+          "latency_ms_per_image": 0.5643059000140056,
+          "detector_auroc": 0.840777,
+          "detection_rate_at_calibrated_threshold": 0.444
+        }
+      },
+      "oracle_routing_diagnostic": {
+        "accuracy": 0.6930000000000001,
+        "counts": {
+          "both_correct": 0,
+          "raw_only_correct": 0,
+          "purified_only_correct": 693,
+          "both_wrong": 307
+        },
+        "fractions": {
+          "both_correct": 0.0,
+          "raw_only_correct": 0.0,
+          "purified_only_correct": 0.693,
+          "both_wrong": 0.307
+        },
+        "purifier_rescue_fraction": 0.693,
+        "purifier_harm_fraction": 0.0,
+        "uses_ground_truth_labels": true,
+        "deployable": false
+      },
+      "baseline_attack_success_rate_on_initially_correct": 1.0,
+      "initially_correct_examples": 938
+    },
+    {
+      "attack": "pgd",
+      "epsilon_linf": 0.03137254901960784,
+      "examples": 1000,
+      "variants": {
+        "none": {
+          "accuracy": 0.0,
+          "flagged_fraction": null,
+          "latency_ms_per_image": 0.040951100061647594
+        },
+        "max": {
+          "accuracy": 0.321,
+          "flagged_fraction": 0.442,
+          "latency_ms_per_image": 0.5676346999243833,
+          "detector_auroc": 0.782824,
+          "detection_rate_at_calibrated_threshold": 0.442
+        },
+        "always": {
+          "accuracy": 0.567,
+          "flagged_fraction": null,
+          "latency_ms_per_image": 0.04828670003917068
+        },
+        "fusion": {
+          "accuracy": 0.205,
+          "flagged_fraction": 0.271,
+          "latency_ms_per_image": 0.5583282000152394,
+          "detector_auroc": 0.754596,
+          "detection_rate_at_calibrated_threshold": 0.271
+        }
+      },
+      "oracle_routing_diagnostic": {
+        "accuracy": 0.567,
+        "counts": {
+          "both_correct": 0,
+          "raw_only_correct": 0,
+          "purified_only_correct": 567,
+          "both_wrong": 433
+        },
+        "fractions": {
+          "both_correct": 0.0,
+          "raw_only_correct": 0.0,
+          "purified_only_correct": 0.567,
+          "both_wrong": 0.433
+        },
+        "purifier_rescue_fraction": 0.567,
+        "purifier_harm_fraction": 0.0,
+        "uses_ground_truth_labels": true,
+        "deployable": false
+      },
+      "baseline_attack_success_rate_on_initially_correct": 1.0,
+      "initially_correct_examples": 938
+    }
+  ]
+}

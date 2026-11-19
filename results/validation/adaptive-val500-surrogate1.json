@@ -1,0 +1,95 @@
+{
+  "protocol": {
+    "split": "validation",
+    "examples": 500,
+    "subset_seed": 2326,
+    "seed": 2026,
+    "threat_model": "white-box, L-infinity",
+    "epsilon_linf": 0.03137254901960784,
+    "steps": 100,
+    "step_size": 0.007,
+    "eot_samples_purify_attack": 10,
+    "freqpure_surrogate_denoising_steps": 1,
+    "evaluation": "exact stochastic pipeline, one run per candidate",
+    "purifier": {
+      "type": "freqpure",
+      "unet": "checkpoints/ddpm-cifar10-32",
+      "max_timestep": 1000,
+      "num_denoising_steps": 100,
+      "amplitude_cut": 10,
+      "phase_cut": 10,
+      "delta": 0.3,
+      "reference_timestep": 50,
+      "sampling": "ddpm",
+      "ensemble_runs": 1
+    },
+    "epsad_detector": {
+      "type": "epsad",
+      "checkpoint": "checkpoints/epsad.pt",
+      "threshold": 1.0049545764923096,
+      "target_fpr": 0.05,
+      "unet": "checkpoints/ddpm-cifar10-32",
+      "seed": 2026,
+      "train_examples": 10000,
+      "reference_size": 500,
+      "steps": 20,
+      "attack_epsilon": 0.00392156862745098,
+      "kernel_training_attacks": [
+        "FGSM",
+        "FGSM-L2"
+      ],
+      "epochs": 200,
+      "learning_rate": 0.002,
+      "kernel_batch": 500,
+      "feature_dim": 300,
+      "calibration": "clean validation split (5,000 images)"
+    },
+    "attack_seconds_per_image": {
+      "evade": 1.8941783228000277,
+      "purify": 1.3786102814000332
+    }
+  },
+  "epsad_flag_rate": {
+    "clean": 0.048,
+    "evade": 0.202,
+    "purify": 0.998
+  },
+  "evade_attack_found_misclassified_and_undetected_during_search": 0.952,
+  "variants": {
+    "none": {
+      "clean_accuracy": 0.918,
+      "evade_accuracy": 0.0,
+      "purify_accuracy": 0.724,
+      "worst_case_accuracy": 0.0,
+      "worst_case_attack_success_rate_on_undefended_clean_correct": 1.0
+    },
+    "max": {
+      "clean_accuracy": 0.912,
+      "evade_accuracy": 0.242,
+      "purify_accuracy": 0.72,
+      "worst_case_accuracy": 0.204,
+      "worst_case_attack_success_rate_on_undefended_clean_correct": 0.7777777777777778
+    },
+    "always": {
+      "clean_accuracy": 0.9,
+      "evade_accuracy": 0.89,
+      "purify_accuracy": 0.804,
+      "worst_case_accuracy": 0.786,
+      "worst_case_attack_success_rate_on_undefended_clean_correct": 0.1568627450980392
+    },
+    "fusion": {
+      "clean_accuracy": 0.918,
+      "evade_accuracy": 0.504,
+      "purify_accuracy": 0.73,
+      "worst_case_accuracy": 0.428,
+      "worst_case_attack_success_rate_on_undefended_clean_correct": 0.5337690631808278
+    },
+    "epsad": {
+      "clean_accuracy": 0.912,
+      "evade_accuracy": 0.18,
+      "purify_accuracy": 0.806,
+      "worst_case_accuracy": 0.166,
+      "worst_case_attack_success_rate_on_undefended_clean_correct": 0.8213507625272332
+    }
+  }
+}

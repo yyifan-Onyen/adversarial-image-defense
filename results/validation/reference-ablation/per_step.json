@@ -1,0 +1,53 @@
+{
+  "split": "validation",
+  "examples": 1000,
+  "subset_seed": 2126,
+  "seed": 2026,
+  "batch_size": 125,
+  "device": "cuda",
+  "purifier": {
+    "type": "freqpure",
+    "unet": "checkpoints/ddpm-cifar10-32",
+    "max_timestep": 1000,
+    "num_denoising_steps": 100,
+    "amplitude_cut": 10,
+    "phase_cut": 10,
+    "delta": 0.3,
+    "reference_timestep": 50,
+    "sampling": "ddpm",
+    "ensemble_runs": 1,
+    "reference": "per_step",
+    "reference_eps_steps": 20
+  },
+  "attacks": "transfer FGSM / 20-step PGD against the unprotected classifier",
+  "unet_calls_per_purified_image": 200,
+  "conditions": {
+    "clean_0": {
+      "raw_accuracy": 0.926,
+      "purified_accuracy": 0.901,
+      "purify_and_classify_ms_per_image": 48.97185829994851
+    },
+    "fgsm_8": {
+      "raw_accuracy": 0.098,
+      "purified_accuracy": 0.82,
+      "purify_and_classify_ms_per_image": 49.077481000014814
+    },
+    "pgd_4": {
+      "raw_accuracy": 0.0,
+      "purified_accuracy": 0.871,
+      "purify_and_classify_ms_per_image": 48.95332290002261
+    },
+    "pgd_8": {
+      "raw_accuracy": 0.0,
+      "purified_accuracy": 0.86,
+      "purify_and_classify_ms_per_image": 48.829736899991985
+    },
+    "adaptive_eot_pgd_8": {
+      "examples": 256,
+      "raw_accuracy": 0.7578125,
+      "purified_accuracy": 0.8125,
+      "attack": "white-box EOT-PGD, L-inf 8/255, 100 steps, step 0.007, EOT 10, one-step surrogate with the same reference source; evaluated with the full purifier",
+      "attack_seconds_per_image": 1.5997859785156834
+    }
+  }
+}

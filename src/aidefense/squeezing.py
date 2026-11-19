@@ -4,19 +4,32 @@ from io import BytesIO
 
 import numpy as np
 import torch
+import torch.nn.functional as F
 from PIL import Image
-from scipy.ndimage import median_filter
 
 SQUEEZER_NAMES = ("quantize_4bit", "median_3x3", "jpeg_q50")
+
+
+def median_3x3(x: torch.Tensor) -> torch.Tensor:
+    """Per-channel 3x3 median with edge replication, on the input's device.
+
+    Bit-identical to ``scipy.ndimage.median_filter(size=(1, 1, 3, 3),
+    mode="nearest")``, which the detector was originally fitted with.
+    """
+    padded = F.pad(x, (1, 1, 1, 1), mode="replicate")
+    return padded.unfold(2, 3, 1).unfold(3, 3, 1).reshape(*x.shape, 9).median(-1).values
 
 
 def squeeze(x: torch.Tensor, name: str) -> torch.Tensor:
     if name == "quantize_4bit":
         return (x * 15).round().div(15).clamp(0, 1)
-    array = x.detach().cpu().numpy()
     if name == "median_3x3":
-        out = median_filter(array, size=(1, 1, 3, 3), mode="nearest")
-    elif name == "jpeg_q50":
+        return median_3x3(x)
+    # JPEG stays on libjpeg via PIL: measured 0.09 ms/image on CPU, while
+    # torchvision's nvJPEG path was slower (0.46 ms/image at 32x32) and does not
+    # reproduce libjpeg's output, which would invalidate the fitted detector.
+    array = x.detach().cpu().numpy()
+    if name == "jpeg_q50":
         images = []
         for rgb in array:
             pixels = (np.transpose(rgb, (1, 2, 0)).clip(0, 1) * 255).round().astype(np.uint8)

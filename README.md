@@ -1,73 +1,80 @@
 # Learned Fusion Detection and Selective Purification for Adversarial Images
 
-An empirical study of input-side defenses for a clean-trained CIFAR-10 classifier. The project asks whether combining feature-squeezing signals improves attack detection, and whether routing only flagged images through a purifier improves classification outcomes at an acceptable runtime cost.
+An empirical study of input-side defenses for a clean-trained CIFAR-10 classifier. Following the [final project proposal](docs/final-project-proposal.pdf), the project is a controlled test of whether **detection gains translate into useful accuracy after accounting for latency and attack adaptation**.
 
-This repository is the workspace for Team 5's CSCI 8000 final project at the University of Georgia. The [final project proposal](docs/final-project-proposal.pdf) defines the agreed scope and evaluation plan.
+This repository is the workspace for Team 5's CSCI 8000 final project at the University of Georgia. The [experimental protocol](docs/experimental-protocol.md) records the data split, components, attacks, and metrics; the [results report](docs/progress-report.md) contains every measured number.
 
-The [experimental protocol](docs/experimental-protocol.md) records the exact data split, model selection, attacks, metrics, and limitations implemented here.
+**Current state (November 18, 2026):** All proposal experiments have been run on the official CIFAR-10 test set: the 10,000-image matched evaluation (clean, FGSM, PGD at 4/255 and 8/255), C&W L2 on a fixed 1,000-image subset, a white-box adaptive evaluation on a fixed 1,000-image subset, and a serving-cost benchmark. Nothing in the test-set runs was used for model selection.
 
-**Current state (October 19, 2026):** The classifier and detector are trained, the purifier has an epoch-2 progress checkpoint, and a 1,000-image squeezer ablation is measured. Computation is paused. See the [progress report](docs/progress-report.md) and [preliminary numeric records](results/preliminary/). The complete defense comparison is pending.
+## Design
 
-The available model weights and detector feature cache are attached to the [preliminary checkpoint release](https://github.com/yyifan-Onyen/adversarial-image-defense/releases/tag/v0.1.0-preliminary).
+Every variant uses the same frozen ResNet-18 and the same purifier; only the routing differs.
 
-## Research plan
+| Variant | Detector | Purified inputs |
+|---|---|---|
+| `none` | — | none |
+| `max` | Feature squeezing, max-disagreement rule (Xu et al., NDSS 2018) | flagged |
+| `fusion` | Feature squeezing, logistic-regression fusion of the three disagreements and the prediction margin | flagged |
+| `epsad` | EPS-AD (Zhang et al., ICML 2023): expected perturbation score + deep-kernel MMD | flagged |
+| `always` | — | all |
 
-- **Classifier:** Train a ResNet-18 on CIFAR-10, then freeze it for all defense comparisons.
-- **Detection:** Measure prediction changes after 4-bit color quantization, 3 × 3 median smoothing, and JPEG compression at quality 50. Compare a logistic-regression fusion score with the original maximum-disagreement rule. Calibrate both thresholds to a 5% false-positive rate on clean validation images.
-- **Purification:** Train a small convolutional autoencoder on adversarial-to-clean pairs using reconstruction, classification, and clean-image identity losses. Apply it only to inputs flagged by the detector.
-- **Matched baselines:** Compare no defense, the maximum-disagreement detector routing to the same purifier, always-on purification, and learned routing.
-- **Evaluation:** Report detector AUROC and detection rate, clean and attacked classification accuracy, and end-to-end latency. Evaluate FGSM and PGD at both 4/255 and 8/255; assess C&W L2 and one adaptive attack on a fixed, seeded subset. Report transfer and adaptive results separately.
+All three detectors are calibrated to a 5% false-positive rate on clean validation images. The squeezing detectors are the weak detectors of the study and EPS-AD the strong one, so the comparison isolates the effect of detection quality on end-to-end accuracy. `max` and `fusion` are the proposal's baseline and learned detector; EPS-AD was added because the two squeezing detectors are too close in quality to answer the research question on their own. The fusion detector is trained on FGSM and PGD at 4/255 as in the proposal; EPS-AD uses its paper's FGSM / FGSM-L2 examples at 1/255. FreqPure and the diffusion model are used as released, without adversarial training; all attacks are our own PyTorch implementations.
+
+The purifier is FreqPure (ICML 2025) on the public `google/ddpm-cifar10-32` diffusion model: diffuse to t = 999, run 100 DDPM steps, and at each step replace the low-frequency amplitude of the clean estimate and constrain its low-frequency phase using a reference image. The released code redraws the reference (input diffused to t = 50, then denoised in one step) at every step, for 200 UNet calls per image. We compute the reference **once** (101 UNet calls); the [results report](docs/progress-report.md#reference-ablation-once-versus-per-step) shows this halves the cost with no measured loss under transfer or adaptive attacks.
 
 ```mermaid
 flowchart LR
-    x[Input image] --> f[Frozen ResNet-18]
-    x --> s[Three image squeezers]
-    s --> f2[Frozen ResNet-18]
-    f --> d[Prediction disagreement and margin]
-    f2 --> d
-    d --> g[Calibrated fusion detector]
-    g -->|Flagged| p[Residual purifier]
-    x --> p
-    g -->|Unflagged| o[Keep original prediction]
-    f --> o
-    p --> c[Frozen ResNet-18 prediction]
-    c --> r[Final prediction]
-    o --> r
+    x[Input image] --> d{Detector<br/>max / fusion / EPS-AD}
+    d -->|Unflagged| f[Frozen ResNet-18]
+    d -->|Flagged| q[Cross-batch queue]
+    q --> p[FreqPure, reference computed once]
+    p --> f2[Frozen ResNet-18]
+    f --> r[Prediction]
+    f2 --> r
 ```
 
-The official CIFAR-10 test set is excluded from model selection; a fixed 1,000-image subset has been used for the preliminary squeezer ablation. Experiments record data splits, random seeds, attack settings, hardware, and batch sizes. Results are added only after they are measured and verified.
+## Main findings
+
+On the official test set (details and caveats in the [results report](docs/progress-report.md)):
+
+1. **Learned fusion does not consistently beat the max rule.** At the same 5% false-positive rate it is better on FGSM and C&W but worse on PGD (PGD-8 accuracy 25.0% vs 40.1%); both squeezing detectors miss most attacks.
+2. **Under transfer attacks, better detection does translate into accuracy.** Raising detector AUROC from 0.76-0.87 (squeezing) to 1.00 (EPS-AD) lifts PGD-8 accuracy from 25.0-40.1% to 80.0%, matching always-on purification (80.3%) while keeping clean accuracy at 91.4% instead of 86.3%.
+3. **Selective routing improves throughput only with cross-batch queueing.** At 0-25% attacked traffic, queued EPS-AD routing serves images 2.0-3.9× faster than always-on purification; purifying flagged rows inside each batch gives almost no gain. Above about 75% attacked traffic the detector is pure overhead.
+4. **The detection gain does not survive an unseen attack or an adaptive attacker.** EPS-AD detects only 56.8% of C&W L2 examples (routed accuracy 54.1% vs 85.3% for always-on purification). Under white-box adaptive attacks, worst-case accuracy is 0.0% for max and fusion routing, 4.7% for EPS-AD routing, and 23.8% for always-on purification, because routing gives the attacker a way around the purifier.
+5. **One-step surrogates overstate diffusion-purification robustness.** Attacking FreqPure through a one-step surrogate leaves 84.0% accuracy; a ten-step surrogate brings it to 31.6% on the same images.
 
 ## Reproduce the study
 
-Use Python 3.10 or newer. By default, TorchVision downloads CIFAR-10 into the ignored `data/` directory. If that server is slow, the pinned University of Toronto Hugging Face mirror can be downloaded with `scripts/download_cifar10_parquet.sh data` after installing `.[dev,hf-data]`; the loader automatically uses those two files and checks the train/test sizes. The default seed is `2026`; the 50,000 training images are split into 45,000 training and 5,000 validation images. The official 10,000-image test set is never used for model selection.
+Use Python 3.10 or newer and a CUDA GPU. TorchVision downloads CIFAR-10 into the ignored `data/` directory; alternatively, `scripts/download_cifar10_parquet.sh data` fetches the pinned University of Toronto Hugging Face mirror after installing `.[dev,hf-data]`. The default seed `2026` splits the 50,000 training images into 45,000 training and 5,000 validation images. The official test set is used only for final evaluation. The diffusion model is the public `google/ddpm-cifar10-32` checkpoint, stored under `checkpoints/ddpm-cifar10-32`.
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install -e '.[dev]'
 adversarial-image-defense train-classifier --epochs 20
-adversarial-image-defense train-purifier --classifier checkpoints/classifier.pt --epochs 10
 adversarial-image-defense fit-detector --classifier checkpoints/classifier.pt
-adversarial-image-defense ablate-squeezers --classifier checkpoints/classifier.pt \
-  --feature-cache checkpoints/detector.features.npz
-adversarial-image-defense evaluate --classifier checkpoints/classifier.pt \
-  --purifier checkpoints/purifier.pt --detector checkpoints/detector.json \
-  --output runs/final/evaluation.json
-adversarial-image-defense plot-results --report runs/final/evaluation.json
+adversarial-image-defense fit-epsad --classifier checkpoints/classifier.pt
+adversarial-image-defense ablate-squeezers --feature-cache checkpoints/detector.features.npz
+adversarial-image-defense evaluate --epsad checkpoints/epsad.pt \
+  --output runs/final-freqpure/evaluation.json
+adversarial-image-defense adaptive-attack --split test --examples 1000 --batch-size 125 \
+  --output runs/final-freqpure/adaptive.json
+adversarial-image-defense benchmark-latency --split test --examples 1024 \
+  --output runs/final-freqpure/latency.json
 pytest -q
 ```
 
-For the purifier-loss ablation, repeat `train-purifier` with `--classification-weight 0 --output checkpoints/purifier_no_cls.pt`, then repeat `evaluate --skip-expensive` with that purifier and a distinct output path. This repeats the full-test clean, FGSM, and PGD conditions with identical seeds, attacks, batch sizes, and hardware; C&W and adaptive subset checks are reserved for the main model.
+`evaluate`, `adaptive-attack`, and `benchmark-latency` default to the once-reference FreqPure spec in [`configs/freqpure-ref-once.json`](configs/freqpure-ref-once.json); [`configs/freqpure.json`](configs/freqpure.json) is the released per-step reference. The validation-only reference ablation uses `probe-purifier` with each spec and `--adaptive-examples 256 --adaptive-surrogate-steps 10`; [`scripts/reference_variability.py`](scripts/reference_variability.py) measures how much the reference changes between random draws.
 
-`--device auto` selects CUDA, then Apple MPS, then CPU. Training is computationally expensive; use a GPU when possible. Checkpoints, downloaded data, and experiment output are ignored by Git. The evaluation command records the measured protocol and metrics in JSON. Do not treat reduced `--max-train-batches` or `--test-examples` runs as final results.
+The measured outputs of these runs are committed under [`results/`](results): `results/final/` (test set) and `results/validation/` (design-time validation runs); `results/preliminary/` keeps the October classifier and squeezing-detector records. On an RTX 5090 the three final runs take about 25 minutes (latency), 80 minutes (evaluation), and 3 hours (adaptive). `--device auto` selects CUDA, then Apple MPS, then CPU. Checkpoints, data, and run output are ignored by Git. Validation-split runs (`--split validation`) are for integration checks and model selection only.
 
-For a quick integration check before the final test run, use `evaluate --split validation --test-examples 8 --expensive-subset 4 --cw-steps 2 --cw-binary-search-steps 1 --adaptive-steps 2` with a separate output file. Its metrics are only a software check.
+## Earlier design
 
-## Status and limitations
+The proposal's first purifier was a small residual autoencoder trained with reconstruction, classification, and identity losses (`train-purifier`). It recovered at most 69% attacked accuracy on validation while lowering clean accuracy to 80.5%, so it was replaced by FreqPure before any test-set evaluation; its validation results are kept in the [results report](docs/progress-report.md#superseded-autoencoder-purifier). The planned purifier-loss ablation applied to that trained autoencoder and is replaced by the FreqPure reference ablation.
 
-The proposal, implementation, classifier training, detector calibration, and a preliminary squeezer ablation are present. The main purifier finished 2 of 10 planned epochs before computation was paused. Full accuracy, latency, C&W, adaptive, and purifier-loss-ablation results are pending; this repository does not claim completed defense findings. The C&W implementation is a bounded optimization search, and the adaptive PGD check uses BPDA and soft routing to construct candidates, then measures their success on the exact pipeline. Neither establishes certified robustness. JPEG and median filtering run on CPU, so eventual latency will include host/device transfer and depend on hardware and batch size.
+## Limitations
 
-OpenAI Codex assisted with implementation and documentation. External resources include the public CIFAR-10 dataset, the TorchVision ResNet-18 implementation, and the papers cited in the proposal.
+All results are empirical, from one seed and one classifier; nothing here is certified robustness. The adaptive attacks are strong standard choices (Selective PGD with exact EPS-AD gradients, BPDA for squeezers, EOT-PGD through a ten-step FreqPure surrogate) but not a proof of a lower bound. JPEG squeezing runs on the CPU through libjpeg (0.09 ms per image; a GPU nvJPEG path was slower and changed the features). Latency depends on the GPU and the batch size.
 
 ## Team
 

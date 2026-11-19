@@ -1,0 +1,59 @@
+Cannot initialize model with low cpu memory usage because `accelerate` was not found in the environment. Defaulting to `low_cpu_mem_usage=False`. It is strongly recommended to install `accelerate` for faster and less memory-intense model loading. You can do so with: 
+```
+pip install accelerate
+```
+.
+purifier probe:   0%|          | 0/8 [00:00<?, ?it/s]purifier probe:  12%|¨€¨†        | 1/8 [03:03<21:23, 183.39s/it]purifier probe:  25%|¨€¨€¨„       | 2/8 [06:06<18:19, 183.27s/it]purifier probe:  38%|¨€¨€¨€¨‚      | 3/8 [07:26<11:19, 135.95s/it]purifier probe:  50%|¨€¨€¨€¨€¨€     | 4/8 [07:38<05:48, 87.22s/it] purifier probe:  62%|¨€¨€¨€¨€¨€¨€¨†   | 5/8 [07:51<03:00, 60.29s/it]purifier probe:  75%|¨€¨€¨€¨€¨€¨€¨€¨„  | 6/8 [08:03<01:28, 44.05s/it]purifier probe:  88%|¨€¨€¨€¨€¨€¨€¨€¨€¨‚ | 7/8 [08:16<00:33, 33.76s/it]purifier probe: 100%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨€| 8/8 [08:28<00:00, 27.00s/it]purifier probe: 100%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨€| 8/8 [08:28<00:00, 63.61s/it]
+{
+  "split": "validation",
+  "examples": 1000,
+  "subset_seed": 2126,
+  "seed": 2026,
+  "batch_size": 125,
+  "device": "cuda",
+  "purifier": {
+    "type": "freqpure",
+    "unet": "checkpoints/ddpm-cifar10-32",
+    "max_timestep": 1000,
+    "num_denoising_steps": 100,
+    "amplitude_cut": 10,
+    "phase_cut": 10,
+    "delta": 0.3,
+    "reference_timestep": 50,
+    "sampling": "ddpm",
+    "ensemble_runs": 1,
+    "reference": "once",
+    "reference_eps_steps": 20
+  },
+  "attacks": "transfer FGSM / 20-step PGD against the unprotected classifier",
+  "unet_calls_per_purified_image": 101,
+  "conditions": {
+    "clean_0": {
+      "raw_accuracy": 0.926,
+      "purified_accuracy": 0.897,
+      "purify_and_classify_ms_per_image": 24.563304300041636
+    },
+    "fgsm_8": {
+      "raw_accuracy": 0.098,
+      "purified_accuracy": 0.813,
+      "purify_and_classify_ms_per_image": 24.62488640000811
+    },
+    "pgd_4": {
+      "raw_accuracy": 0.0,
+      "purified_accuracy": 0.869,
+      "purify_and_classify_ms_per_image": 24.65056910002022
+    },
+    "pgd_8": {
+      "raw_accuracy": 0.0,
+      "purified_accuracy": 0.861,
+      "purify_and_classify_ms_per_image": 24.515588499984005
+    },
+    "adaptive_eot_pgd_8": {
+      "examples": 256,
+      "raw_accuracy": 0.7578125,
+      "purified_accuracy": 0.83984375,
+      "attack": "white-box EOT-PGD, L-inf 8/255, 100 steps, step 0.007, EOT 10, one-step surrogate with the same reference source; evaluated with the full purifier",
+      "attack_seconds_per_image": 1.5667506191407483
+    }
+  }
+}

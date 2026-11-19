@@ -1,0 +1,562 @@
+{
+  "protocol": {
+    "split": "test",
+    "examples": 1024,
+    "subset_seed": 2426,
+    "stream_order_seed": 2427,
+    "batch_size": 64,
+    "batch1_examples": 100,
+    "attack": "transfer PGD-8 against the undefended classifier (20 steps, step 1/255)",
+    "device": "cuda",
+    "device_name": "NVIDIA GeForce RTX 5090",
+    "purifier": {
+      "type": "freqpure",
+      "unet": "checkpoints/ddpm-cifar10-32",
+      "max_timestep": 1000,
+      "num_denoising_steps": 100,
+      "amplitude_cut": 10,
+      "phase_cut": 10,
+      "delta": 0.3,
+      "reference_timestep": 50,
+      "sampling": "ddpm",
+      "ensemble_runs": 1,
+      "reference": "once",
+      "reference_eps_steps": 20
+    },
+    "epsad_detector": {
+      "type": "epsad",
+      "checkpoint": "checkpoints/epsad.pt",
+      "threshold": 1.0049545764923096,
+      "target_fpr": 0.05,
+      "unet": "checkpoints/ddpm-cifar10-32",
+      "seed": 2026,
+      "train_examples": 10000,
+      "reference_size": 500,
+      "steps": 20,
+      "attack_epsilon": 0.00392156862745098,
+      "kernel_training_attacks": [
+        "FGSM",
+        "FGSM-L2"
+      ],
+      "epochs": 200,
+      "learning_rate": 0.002,
+      "kernel_batch": 500,
+      "feature_dim": 300,
+      "calibration": "clean validation split (5,000 images)"
+    },
+    "warmup_excluded": true,
+    "queued_policy": "flagged rows purified in full cross-batch batches; remainder flushed at end"
+  },
+  "batch1_latency": {
+    "none": {
+      "clean": {
+        "mean_ms": 1.5307880035834387,
+        "median_ms": 1.3979999930597842,
+        "p95_ms": 1.7522749549243581
+      },
+      "pgd_8": {
+        "mean_ms": 1.4510680007515475,
+        "median_ms": 1.3979000214021653,
+        "p95_ms": 1.7580000392626962
+      }
+    },
+    "max": {
+      "clean": {
+        "mean_ms": 60.002470996114425,
+        "median_ms": 7.748900010483339,
+        "p95_ms": 9.407044984982347
+      },
+      "pgd_8": {
+        "mean_ms": 567.1424750052392,
+        "median_ms": 8.325450005941093,
+        "p95_ms": 1250.854340015212
+      }
+    },
+    "always": {
+      "clean": {
+        "mean_ms": 1169.1678259981563,
+        "median_ms": 1158.82275000331,
+        "p95_ms": 1299.0522499603683
+      },
+      "pgd_8": {
+        "mean_ms": 1197.4351590004517,
+        "median_ms": 1172.7523499866948,
+        "p95_ms": 1344.450240023434
+      }
+    },
+    "fusion": {
+      "clean": {
+        "mean_ms": 54.21853000007104,
+        "median_ms": 6.677850004052743,
+        "p95_ms": 8.898889989359304
+      },
+      "pgd_8": {
+        "mean_ms": 327.17741499945987,
+        "median_ms": 7.022399979177862,
+        "p95_ms": 1214.833575009834
+      }
+    },
+    "epsad": {
+      "clean": {
+        "mean_ms": 278.3707639959175,
+        "median_ms": 206.4752499863971,
+        "p95_ms": 1304.9589199770708
+      },
+      "pgd_8": {
+        "mean_ms": 1393.2601920032175,
+        "median_ms": 1373.723050026456,
+        "p95_ms": 1581.4054050162667
+      }
+    }
+  },
+  "stream": [
+    {
+      "attack_fraction": 0.0,
+      "attacked_examples": 0,
+      "variants": {
+        "none": {
+          "per_batch": {
+            "ms_per_image": 0.03887597659968378,
+            "images_per_second": 25722.826471917724,
+            "purified_fraction": 0.0,
+            "accuracy": 0.9091796875
+          }
+        },
+        "max": {
+          "per_batch": {
+            "ms_per_image": 16.479324316435395,
+            "images_per_second": 60.68209962969572,
+            "purified_fraction": 0.0341796875,
+            "accuracy": 0.9052734375
+          },
+          "queued": {
+            "ms_per_image": 1.4407131836264853,
+            "images_per_second": 694.1006796945205,
+            "purified_fraction": 0.0341796875,
+            "accuracy": 0.90625
+          }
+        },
+        "always": {
+          "per_batch": {
+            "ms_per_image": 28.998830566422384,
+            "images_per_second": 34.484149204206034,
+            "purified_fraction": 1.0,
+            "accuracy": 0.86328125
+          }
+        },
+        "fusion": {
+          "per_batch": {
+            "ms_per_image": 18.85210957027539,
+            "images_per_second": 53.044461484391434,
+            "purified_fraction": 0.0478515625,
+            "accuracy": 0.8994140625
+          },
+          "queued": {
+            "ms_per_image": 1.8150636718701207,
+            "images_per_second": 550.9448596751796,
+            "purified_fraction": 0.0478515625,
+            "accuracy": 0.896484375
+          }
+        },
+        "epsad": {
+          "per_batch": {
+            "ms_per_image": 23.699270312533827,
+            "images_per_second": 42.19539195985837,
+            "purified_fraction": 0.0517578125,
+            "accuracy": 0.90625
+          },
+          "queued": {
+            "ms_per_image": 7.518231445317269,
+            "images_per_second": 133.0100047163153,
+            "purified_fraction": 0.0546875,
+            "accuracy": 0.9072265625
+          }
+        }
+      }
+    },
+    {
+      "attack_fraction": 0.05,
+      "attacked_examples": 51,
+      "variants": {
+        "none": {
+          "per_batch": {
+            "ms_per_image": 0.04181201171604698,
+            "images_per_second": 23916.572270934554,
+            "purified_fraction": 0.0,
+            "accuracy": 0.86328125
+          }
+        },
+        "max": {
+          "per_batch": {
+            "ms_per_image": 19.435831445264284,
+            "images_per_second": 51.45136202771809,
+            "purified_fraction": 0.0517578125,
+            "accuracy": 0.880859375
+          },
+          "queued": {
+            "ms_per_image": 1.8791438476455369,
+            "images_per_second": 532.157238123598,
+            "purified_fraction": 0.0517578125,
+            "accuracy": 0.8828125
+          }
+        },
+        "always": {
+          "per_batch": {
+            "ms_per_image": 29.077571093750976,
+            "images_per_second": 34.3907679488026,
+            "purified_fraction": 1.0,
+            "accuracy": 0.859375
+          }
+        },
+        "fusion": {
+          "per_batch": {
+            "ms_per_image": 18.74279443359228,
+            "images_per_second": 53.35383704618362,
+            "purified_fraction": 0.05859375,
+            "accuracy": 0.86328125
+          },
+          "queued": {
+            "ms_per_image": 1.9095539062732314,
+            "images_per_second": 523.6825191029268,
+            "purified_fraction": 0.05859375,
+            "accuracy": 0.865234375
+          }
+        },
+        "epsad": {
+          "per_batch": {
+            "ms_per_image": 23.79492333983535,
+            "images_per_second": 42.025771031835546,
+            "purified_fraction": 0.0927734375,
+            "accuracy": 0.8984375
+          },
+          "queued": {
+            "ms_per_image": 8.688656054687272,
+            "images_per_second": 115.09259817696774,
+            "purified_fraction": 0.091796875,
+            "accuracy": 0.8955078125
+          }
+        }
+      }
+    },
+    {
+      "attack_fraction": 0.1,
+      "attacked_examples": 102,
+      "variants": {
+        "none": {
+          "per_batch": {
+            "ms_per_image": 0.0345667968986163,
+            "images_per_second": 28929.495635160503,
+            "purified_fraction": 0.0,
+            "accuracy": 0.81640625
+          }
+        },
+        "max": {
+          "per_batch": {
+            "ms_per_image": 18.229037500020695,
+            "images_per_second": 54.857531561875646,
+            "purified_fraction": 0.0673828125,
+            "accuracy": 0.8486328125
+          },
+          "queued": {
+            "ms_per_image": 3.228655175746553,
+            "images_per_second": 309.7264791582374,
+            "purified_fraction": 0.0673828125,
+            "accuracy": 0.849609375
+          }
+        },
+        "always": {
+          "per_batch": {
+            "ms_per_image": 28.98057099611151,
+            "images_per_second": 34.50587637262826,
+            "purified_fraction": 1.0,
+            "accuracy": 0.8623046875
+          }
+        },
+        "fusion": {
+          "per_batch": {
+            "ms_per_image": 18.70270703125243,
+            "images_per_second": 53.46819571781715,
+            "purified_fraction": 0.06640625,
+            "accuracy": 0.8310546875
+          },
+          "queued": {
+            "ms_per_image": 3.131486816414508,
+            "images_per_second": 319.33712598061663,
+            "purified_fraction": 0.06640625,
+            "accuracy": 0.83203125
+          }
+        },
+        "epsad": {
+          "per_batch": {
+            "ms_per_image": 23.7362510741832,
+            "images_per_second": 42.12965210364044,
+            "purified_fraction": 0.1494140625,
+            "accuracy": 0.90234375
+          },
+          "queued": {
+            "ms_per_image": 10.710324902333923,
+            "images_per_second": 93.36784916600304,
+            "purified_fraction": 0.150390625,
+            "accuracy": 0.8984375
+          }
+        }
+      }
+    },
+    {
+      "attack_fraction": 0.25,
+      "attacked_examples": 256,
+      "variants": {
+        "none": {
+          "per_batch": {
+            "ms_per_image": 0.03454306641970106,
+            "images_per_second": 28949.36968970614,
+            "purified_fraction": 0.0,
+            "accuracy": 0.677734375
+          }
+        },
+        "max": {
+          "per_batch": {
+            "ms_per_image": 18.544068164089822,
+            "images_per_second": 53.925599881933024,
+            "purified_fraction": 0.130859375,
+            "accuracy": 0.7685546875
+          },
+          "queued": {
+            "ms_per_image": 4.970012109367872,
+            "images_per_second": 201.20675322201348,
+            "purified_fraction": 0.130859375,
+            "accuracy": 0.7705078125
+          }
+        },
+        "always": {
+          "per_batch": {
+            "ms_per_image": 28.90456718751011,
+            "images_per_second": 34.59660867823365,
+            "purified_fraction": 1.0,
+            "accuracy": 0.8427734375
+          }
+        },
+        "fusion": {
+          "per_batch": {
+            "ms_per_image": 18.338425976537565,
+            "images_per_second": 54.530307087392,
+            "purified_fraction": 0.09375,
+            "accuracy": 0.73046875
+          },
+          "queued": {
+            "ms_per_image": 3.2755113281268677,
+            "images_per_second": 305.29584538846933,
+            "purified_fraction": 0.09375,
+            "accuracy": 0.728515625
+          }
+        },
+        "epsad": {
+          "per_batch": {
+            "ms_per_image": 24.155922265606478,
+            "images_per_second": 41.39771559969844,
+            "purified_fraction": 0.27734375,
+            "accuracy": 0.880859375
+          },
+          "queued": {
+            "ms_per_image": 14.0796263671632,
+            "images_per_second": 71.02461201187987,
+            "purified_fraction": 0.2861328125,
+            "accuracy": 0.87890625
+          }
+        }
+      }
+    },
+    {
+      "attack_fraction": 0.5,
+      "attacked_examples": 512,
+      "variants": {
+        "none": {
+          "per_batch": {
+            "ms_per_image": 0.03437255861626909,
+            "images_per_second": 29092.97533430298,
+            "purified_fraction": 0.0,
+            "accuracy": 0.4560546875
+          }
+        },
+        "max": {
+          "per_batch": {
+            "ms_per_image": 18.509269140622564,
+            "images_per_second": 54.0269846638777,
+            "purified_fraction": 0.2294921875,
+            "accuracy": 0.6591796875
+          },
+          "queued": {
+            "ms_per_image": 7.11763583984748,
+            "images_per_second": 140.49608922130926,
+            "purified_fraction": 0.2294921875,
+            "accuracy": 0.658203125
+          }
+        },
+        "always": {
+          "per_batch": {
+            "ms_per_image": 28.924430175777616,
+            "images_per_second": 34.57285049084344,
+            "purified_fraction": 1.0,
+            "accuracy": 0.8330078125
+          }
+        },
+        "fusion": {
+          "per_batch": {
+            "ms_per_image": 19.318026171845304,
+            "images_per_second": 51.765122953266896,
+            "purified_fraction": 0.162109375,
+            "accuracy": 0.5849609375
+          },
+          "queued": {
+            "ms_per_image": 5.299803515640633,
+            "images_per_second": 188.68624035755812,
+            "purified_fraction": 0.162109375,
+            "accuracy": 0.5849609375
+          }
+        },
+        "epsad": {
+          "per_batch": {
+            "ms_per_image": 25.795819042969015,
+            "images_per_second": 38.76597204896903,
+            "purified_fraction": 0.5185546875,
+            "accuracy": 0.85546875
+          },
+          "queued": {
+            "ms_per_image": 22.321423339860758,
+            "images_per_second": 44.80001049996832,
+            "purified_fraction": 0.5224609375,
+            "accuracy": 0.8564453125
+          }
+        }
+      }
+    },
+    {
+      "attack_fraction": 0.75,
+      "attacked_examples": 768,
+      "variants": {
+        "none": {
+          "per_batch": {
+            "ms_per_image": 0.03562441406756989,
+            "images_per_second": 28070.637122712254,
+            "purified_fraction": 0.0,
+            "accuracy": 0.2265625
+          }
+        },
+        "max": {
+          "per_batch": {
+            "ms_per_image": 18.871422949246153,
+            "images_per_second": 52.9901747573278,
+            "purified_fraction": 0.3427734375,
+            "accuracy": 0.544921875
+          },
+          "queued": {
+            "ms_per_image": 11.00796201171761,
+            "images_per_second": 90.843336753482,
+            "purified_fraction": 0.3427734375,
+            "accuracy": 0.5400390625
+          }
+        },
+        "always": {
+          "per_batch": {
+            "ms_per_image": 30.571783593757118,
+            "images_per_second": 32.709900517685334,
+            "purified_fraction": 1.0,
+            "accuracy": 0.83203125
+          }
+        },
+        "fusion": {
+          "per_batch": {
+            "ms_per_image": 17.802504199210034,
+            "images_per_second": 56.17187272138792,
+            "purified_fraction": 0.21875,
+            "accuracy": 0.4287109375
+          },
+          "queued": {
+            "ms_per_image": 6.967026074221394,
+            "images_per_second": 143.53326503256352,
+            "purified_fraction": 0.21875,
+            "accuracy": 0.42578125
+          }
+        },
+        "epsad": {
+          "per_batch": {
+            "ms_per_image": 29.98091259763669,
+            "images_per_second": 33.35455506043626,
+            "purified_fraction": 0.7578125,
+            "accuracy": 0.8251953125
+          },
+          "queued": {
+            "ms_per_image": 29.105129785136796,
+            "images_per_second": 34.35820446025542,
+            "purified_fraction": 0.76171875,
+            "accuracy": 0.8349609375
+          }
+        }
+      }
+    },
+    {
+      "attack_fraction": 1.0,
+      "attacked_examples": 1024,
+      "variants": {
+        "none": {
+          "per_batch": {
+            "ms_per_image": 0.034670117202040274,
+            "images_per_second": 28843.2829393825,
+            "purified_fraction": 0.0,
+            "accuracy": 0.0
+          }
+        },
+        "max": {
+          "per_batch": {
+            "ms_per_image": 19.30766767577552,
+            "images_per_second": 51.79289476038869,
+            "purified_fraction": 0.435546875,
+            "accuracy": 0.4169921875
+          },
+          "queued": {
+            "ms_per_image": 13.814913574208276,
+            "images_per_second": 72.38554151123667,
+            "purified_fraction": 0.435546875,
+            "accuracy": 0.4140625
+          }
+        },
+        "always": {
+          "per_batch": {
+            "ms_per_image": 30.365611425793304,
+            "images_per_second": 32.9319896108061,
+            "purified_fraction": 1.0,
+            "accuracy": 0.8017578125
+          }
+        },
+        "fusion": {
+          "per_batch": {
+            "ms_per_image": 19.607346582006357,
+            "images_per_second": 51.001291572909665,
+            "purified_fraction": 0.2646484375,
+            "accuracy": 0.2548828125
+          },
+          "queued": {
+            "ms_per_image": 9.003781640615216,
+            "images_per_second": 111.06444379871382,
+            "purified_fraction": 0.2646484375,
+            "accuracy": 0.25390625
+          }
+        },
+        "epsad": {
+          "per_batch": {
+            "ms_per_image": 34.608651269536495,
+            "images_per_second": 28.894509416500377,
+            "purified_fraction": 1.0,
+            "accuracy": 0.8095703125
+          },
+          "queued": {
+            "ms_per_image": 34.663809472647245,
+            "images_per_second": 28.84853151495328,
+            "purified_fraction": 1.0,
+            "accuracy": 0.7880859375
+          }
+        }
+      }
+    }
+  ]
+}

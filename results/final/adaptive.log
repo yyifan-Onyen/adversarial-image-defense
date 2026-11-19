@@ -1,0 +1,158 @@
+Cannot initialize model with low cpu memory usage because `accelerate` was not found in the environment. Defaulting to `low_cpu_mem_usage=False`. It is strongly recommended to install `accelerate` for faster and less memory-intense model loading. You can do so with: 
+```
+pip install accelerate
+```
+.
+Cannot initialize model with low cpu memory usage because `accelerate` was not found in the environment. Defaulting to `low_cpu_mem_usage=False`. It is strongly recommended to install `accelerate` for faster and less memory-intense model loading. You can do so with: 
+```
+pip install accelerate
+```
+.
+adaptive attacks:   0%|          | 0/8 [00:00<?, ?it/s]adaptive attacks:  12%|¨€¨†        | 1/8 [21:50<2:32:50, 1310.12s/it]adaptive attacks:  25%|¨€¨€¨„       | 2/8 [43:42<2:11:09, 1311.64s/it]adaptive attacks:  38%|¨€¨€¨€¨‚      | 3/8 [1:05:39<1:49:29, 1313.90s/it]adaptive attacks:  50%|¨€¨€¨€¨€¨€     | 4/8 [1:27:28<1:27:27, 1311.95s/it]adaptive attacks:  62%|¨€¨€¨€¨€¨€¨€¨†   | 5/8 [1:49:11<1:05:26, 1308.77s/it]adaptive attacks:  75%|¨€¨€¨€¨€¨€¨€¨€¨„  | 6/8 [2:11:03<43:39, 1309.74s/it]  adaptive attacks:  88%|¨€¨€¨€¨€¨€¨€¨€¨€¨‚ | 7/8 [2:32:48<21:48, 1308.23s/it]adaptive attacks: 100%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨€| 8/8 [2:54:29<00:00, 1306.05s/it]adaptive attacks: 100%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨€| 8/8 [2:54:29<00:00, 1308.71s/it]
+{
+  "protocol": {
+    "split": "test",
+    "examples": 1000,
+    "subset_seed": 2326,
+    "seed": 2026,
+    "threat_model": "white-box, L-infinity",
+    "epsilon_linf": 0.03137254901960784,
+    "steps": 100,
+    "step_size": 0.007,
+    "eot_samples_purify_attack": 10,
+    "freqpure_surrogate_denoising_steps": 10,
+    "attacks": [
+      "evade_epsad",
+      "evade_max",
+      "evade_fusion",
+      "purify"
+    ],
+    "worst_case": "per image, over all attacks",
+    "evaluation": "exact stochastic pipeline, one run per candidate",
+    "purifier": {
+      "type": "freqpure",
+      "unet": "checkpoints/ddpm-cifar10-32",
+      "max_timestep": 1000,
+      "num_denoising_steps": 100,
+      "amplitude_cut": 10,
+      "phase_cut": 10,
+      "delta": 0.3,
+      "reference_timestep": 50,
+      "sampling": "ddpm",
+      "ensemble_runs": 1,
+      "reference": "once",
+      "reference_eps_steps": 20
+    },
+    "epsad_detector": {
+      "type": "epsad",
+      "checkpoint": "checkpoints/epsad.pt",
+      "threshold": 1.0049545764923096,
+      "target_fpr": 0.05,
+      "unet": "checkpoints/ddpm-cifar10-32",
+      "seed": 2026,
+      "train_examples": 10000,
+      "reference_size": 500,
+      "steps": 20,
+      "attack_epsilon": 0.00392156862745098,
+      "kernel_training_attacks": [
+        "FGSM",
+        "FGSM-L2"
+      ],
+      "epochs": 200,
+      "learning_rate": 0.002,
+      "kernel_batch": 500,
+      "feature_dim": 300,
+      "calibration": "clean validation split (5,000 images)"
+    },
+    "attack_seconds_per_image": {
+      "evade_epsad": 1.5282406447000103,
+      "evade_max": 0.03145111970003927,
+      "evade_fusion": 0.03195608899992658,
+      "purify": 8.54988348089991
+    }
+  },
+  "flag_rate": {
+    "clean": {
+      "max": 0.046,
+      "fusion": 0.06,
+      "epsad": 0.05
+    },
+    "evade_epsad": {
+      "max": 0.341,
+      "fusion": 0.568,
+      "epsad": 0.17
+    },
+    "evade_max": {
+      "max": 0.0,
+      "fusion": 0.518,
+      "epsad": 1.0
+    },
+    "evade_fusion": {
+      "max": 0.323,
+      "fusion": 0.0,
+      "epsad": 1.0
+    },
+    "purify": {
+      "max": 0.062,
+      "fusion": 0.101,
+      "epsad": 0.999
+    }
+  },
+  "evade_found_misclassified_and_undetected_during_search": {
+    "epsad": 0.974,
+    "max": 1.0,
+    "fusion": 1.0
+  },
+  "variants": {
+    "none": {
+      "clean_accuracy": 0.921,
+      "evade_epsad_accuracy": 0.001,
+      "evade_max_accuracy": 0.0,
+      "evade_fusion_accuracy": 0.0,
+      "purify_accuracy": 0.241,
+      "worst_case_accuracy": 0.0,
+      "worst_case_attack_success_rate_on_undefended_clean_correct": 1.0,
+      "worst_case_attack_success_rate_on_variant_clean_correct": 1.0
+    },
+    "max": {
+      "clean_accuracy": 0.914,
+      "evade_epsad_accuracy": 0.33,
+      "evade_max_accuracy": 0.0,
+      "evade_fusion_accuracy": 0.303,
+      "purify_accuracy": 0.219,
+      "worst_case_accuracy": 0.0,
+      "worst_case_attack_success_rate_on_undefended_clean_correct": 1.0,
+      "worst_case_attack_success_rate_on_variant_clean_correct": 1.0
+    },
+    "always": {
+      "clean_accuracy": 0.858,
+      "evade_epsad_accuracy": 0.857,
+      "evade_max_accuracy": 0.844,
+      "evade_fusion_accuracy": 0.856,
+      "purify_accuracy": 0.239,
+      "worst_case_accuracy": 0.238,
+      "worst_case_attack_success_rate_on_undefended_clean_correct": 0.741585233441911,
+      "worst_case_attack_success_rate_on_variant_clean_correct": 0.7237762237762237
+    },
+    "fusion": {
+      "clean_accuracy": 0.909,
+      "evade_epsad_accuracy": 0.512,
+      "evade_max_accuracy": 0.476,
+      "evade_fusion_accuracy": 0.0,
+      "purify_accuracy": 0.216,
+      "worst_case_accuracy": 0.0,
+      "worst_case_attack_success_rate_on_undefended_clean_correct": 1.0,
+      "worst_case_attack_success_rate_on_variant_clean_correct": 1.0
+    },
+    "epsad": {
+      "clean_accuracy": 0.915,
+      "evade_epsad_accuracy": 0.152,
+      "evade_max_accuracy": 0.852,
+      "evade_fusion_accuracy": 0.844,
+      "purify_accuracy": 0.237,
+      "worst_case_accuracy": 0.047,
+      "worst_case_attack_success_rate_on_undefended_clean_correct": 0.9489685124864278,
+      "worst_case_attack_success_rate_on_variant_clean_correct": 0.9486338797814208
+    }
+  }
+}

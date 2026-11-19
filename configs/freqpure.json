@@ -1,0 +1,12 @@
+{
+  "type": "freqpure",
+  "unet": "checkpoints/ddpm-cifar10-32",
+  "max_timestep": 1000,
+  "num_denoising_steps": 100,
+  "amplitude_cut": 10,
+  "phase_cut": 10,
+  "delta": 0.3,
+  "reference_timestep": 50,
+  "sampling": "ddpm",
+  "ensemble_runs": 1
+}
